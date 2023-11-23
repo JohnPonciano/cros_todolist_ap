@@ -3,6 +3,7 @@ const router = express.Router();
 const taskController = require('../controllers/taskController');
 const subtaskController = require('../controllers/subtaskController');
 const authenticateToken = require('../middlewares/authMiddleware');
+const subsubtaskController = require('../controllers/subsubtaskController')
 
 router.use(authenticateToken)
 /**
@@ -26,7 +27,7 @@ router.use(authenticateToken)
  *                 example: Descrição da Tarefa 1
  *               status:
  *                 type: string
- *                 example: Em andamento
+ *                 example: nao_concluida
  *               userId:
  *                 type: integer
  *                 example: 1
@@ -96,7 +97,7 @@ router.get('/:id', taskController.getTaskById);
  *                 example: Nova Descrição da Tarefa
  *               status:
  *                 type: string
- *                 example: Concluída
+ *                 example: concluida
  *     responses:
  *       '200':
  *         description: Tarefa atualizada com sucesso
@@ -125,44 +126,6 @@ router.put('/:id', taskController.updateTask);
 router.delete('/:id', taskController.deleteTask);
 /**
  * @swagger
- * /tasks/{id}/complete:
- *   put:
- *     summary: Marcar uma tarefa como concluída pelo ID
- *     tags: [Tasks]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       '200':
- *         description: Tarefa marcada como concluída com sucesso
- *       '500':
- *         description: Erro ao marcar tarefa como concluída
- */
-router.put('/:id/complete', taskController.markTaskAsCompleted);
-/**
- * @swagger
- * /tasks/{id}/incomplete:
- *   put:
- *     summary: Marcar uma tarefa como incompleta pelo ID
- *     tags: [Tasks]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       '200':
- *         description: Tarefa marcada como incompleta com sucesso
- *       '500':
- *         description: Erro ao marcar tarefa como incompleta
- */
-router.put('/:id/incomplete', taskController.markTaskAsIncomplete);
-/**
- * @swagger
  * /tasks/status/{status}:
  *   get:
  *     summary: Filtrar as tarefas pelo status
@@ -173,6 +136,7 @@ router.put('/:id/incomplete', taskController.markTaskAsIncomplete);
  *         required: true
  *         schema:
  *           type: string
+ *     description: Opções disponiveis - em_progresso, nao_concluida, concluida
  *     responses:
  *       '200':
  *         description: Lista de tarefas filtrada por status retornada com sucesso
@@ -180,6 +144,7 @@ router.put('/:id/incomplete', taskController.markTaskAsIncomplete);
  *         description: Erro ao filtrar tarefas por status
  */
 router.get('/status/:status', taskController.filterTasksByStatus);
+
 
 /**
  * @swagger
@@ -208,7 +173,7 @@ router.get('/status/:status', taskController.filterTasksByStatus);
  *                 example: Descrição da Subtarefa 1
  *               status:
  *                 type: string
- *                 example: Em andamento
+ *                 example: nao_concluida
  *     responses:
  *       '200':
  *         description: Subtarefa criada com sucesso
@@ -242,13 +207,13 @@ router.post('/:id/subtasks', subtaskController.createSubtask); // Criar uma subt
  *             properties:
  *               titulo:
  *                 type: string
- *                 example: Novo Título da Subtarefa
+ *                 example: Título da Subtarefa 1
  *               descricao:
  *                 type: string
- *                 example: Nova Descrição da Subtarefa
+ *                 example: Descrição da Subtarefa 1
  *               status:
  *                 type: string
- *                 example: Concluída
+ *                 example: nao_concluida
  *     responses:
  *       '200':
  *         description: Subtarefa atualizada com sucesso
@@ -303,6 +268,141 @@ router.delete('/:taskId/subtasks/:subtaskId', subtaskController.deleteSubtask); 
  *       '500':
  *         description: Erro ao filtrar subtarefas por status
  */
-router.get('/:taskId/subtasks/status/:status', subtaskController.filterSubtasksByStatus); // Filtrar subtarefas por status
+router.get('/:taskId/subtasks/status/:status', subtaskController.filterSubtasksByStatus);
+
+
+// /**
+//  * @swagger
+//  * /tasks/:taskId/subtasks/:subtaskId/subsubtasks:
+//  *   post:
+//  *     summary: Criar uma sub-subtarefa
+//  *     tags: [Sub-subtask]
+//  *     description: Cria uma sub-subtarefa para uma subtarefa específica.
+//  *     parameters:
+//  *       - in: path
+//  *         name: taskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da tarefa.
+//  *       - in: path
+//  *         name: subtaskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da subtarefa associada à tarefa.
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             properties:
+//  *               titulo:
+//  *                 type: string
+//  *                 example: Título da Subtarefa 1
+//  *               descricao:
+//  *                 type: string
+//  *                 example: Descrição da Subtarefa 1
+//  *               status:
+//  *                 type: string
+//  *                 example: nao_concluida
+//  *     responses:
+//  *       '200':
+//  *         description: Sub-subtarefa criada com sucesso
+//  *       '404':
+//  *         description: Subtarefa não encontrada
+//  *       '500':
+//  *         description: Erro ao criar sub-subtarefa
+//  */
+// router.post('/tasks/:taskId/subtasks/:subtaskId/subsubtasks', subsubtaskController.createSubsubtaskInSubtask);
+
+// /**
+//  * @swagger
+//  * /tasks/:taskId/subtasks/:subtaskId/subsubtasks/:subsubtaskId:
+//  *   put:
+//  *     summary: Atualizar uma sub-subtarefa
+//  *     tags: [Sub-subtask]
+//  *     description: Atualiza uma sub-subtarefa específica de uma subtarefa associada a uma tarefa.
+//  *     parameters:
+//  *       - in: path
+//  *         name: taskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da tarefa.
+//  *       - in: path
+//  *         name: subtaskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da subtarefa associada à tarefa.
+//  *       - in: path
+//  *         name: subsubtaskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da sub-subtarefa associada à tarefa.
+//  *       - in: body
+//  *         name: subsubtask
+//  *         required: true
+//  *         schema:
+//  *           type: object
+//  *           properties:
+//  *             titulo:
+//  *               type: string
+//  *               example: Novo Título da Subtarefa 1
+//  *             descricao:
+//  *               type: string
+//  *               example: Nova Descrição da Subtarefa 1
+//  *             status:
+//  *               type: string
+//  *               example: em_progresso
+//  *               enum: [em_progresso, concluida, nao_concluida] # Enumerating possible status values
+//  *     responses:
+//  *       '200':
+//  *         description: Sub-subtarefa atualizada com sucesso
+//  *       '404':
+//  *         description: Subtarefa ou sub-subtarefa não encontrada
+//  *       '500':
+//  *         description: Erro ao atualizar a sub-subtarefa
+//  */
+// router.put('/tasks/:taskId/subtasks/:subtaskId/subsubtasks/:subsubtaskId', subsubtaskController.updateSubsubtaskInSubtask);
+
+// /**
+//  * @swagger
+//  * /tasks/:subtaskId/subsubtasks/:subsubtaskId:
+//  *   delete:
+//  *     summary: Deletar uma sub-subtarefa
+//  *     tags: [Sub-subtask]
+//  *     description: Deleta uma sub-subtarefa específica de uma subtarefa associada a uma tarefa.
+//  *     parameters:
+//  *       - in: path
+//  *         name: taskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da tarefa.
+//  *       - in: path
+//  *         name: subtaskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da subtarefa associada à tarefa.
+//  *       - in: path
+//  *         name: subsubtaskId
+//  *         required: true
+//  *         schema:
+//  *           type: integer
+//  *         description: ID da sub-subtarefa associada à subtarefa.
+//  *     responses:
+//  *       '200':
+//  *         description: Sub-subtarefa excluída com sucesso
+//  *       '404':
+//  *         description: Subtarefa ou sub-subtarefa não encontrada
+//  *       '500':
+//  *         description: Erro ao excluir a sub-subtarefa
+//  */
+// router.delete('/tasks/:taskId/subtasks/:subtaskId/subsubtasks/:subsubtaskId', subsubtaskController.deleteSubsubtaskInSubtask);
 
 module.exports = router;

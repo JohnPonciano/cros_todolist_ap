@@ -1,10 +1,10 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model User {
@@ -16,20 +16,30 @@ model User {
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   titulo      String
   descricao   String?
-  status      String   @default("nao_concluida")
-  user        User?    @relation(fields: [userId], references: [id])
+  status      String       @default("nao_concluida")
+  user        User?        @relation(fields: [userId], references: [id])
   userId      Int?
-  subtasks    Subtask[]
+  subtasks    Subtask[]    // Relacionamento com as subtasks
 }
 
 model Subtask {
-  id          Int      @id @default(autoincrement())
-  titulo      String
-  descricao   String?
-  status      String   @default("nao_concluida")
-  task        Task?    @relation(fields: [taskId], references: [id])
-  taskId      Int?
+  id           Int           @id @default(autoincrement())
+  titulo       String
+  descricao    String?
+  status       String        @default("nao_concluida")
+  task         Task?         @relation(fields: [taskId], references: [id])
+  taskId       Int?
+  subSubtasks  SubSubtask[]  // Relacionamento com as subsubtasks
+}
+
+model SubSubtask {
+  id         Int      @id @default(autoincrement())
+  titulo     String
+  descricao  String?
+  status     String   @default("nao_concluida")
+  subtask    Subtask? @relation(fields: [subtaskId], references: [id])
+  subtaskId Int?
 }

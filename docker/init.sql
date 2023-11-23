@@ -11,7 +11,7 @@ CREATE TABLE Task (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     descricao TEXT,
-    status ENUM('concluida', 'nao_concluida') DEFAULT 'nao_concluida',
+    status ENUM('concluida', 'nao_concluida', 'em_progresso') DEFAULT 'nao_concluida',
     userId INT,
     FOREIGN KEY (userId) REFERENCES User(id)
 );
@@ -21,7 +21,17 @@ CREATE TABLE Subtask (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     descricao TEXT,
-    status ENUM('concluida', 'nao_concluida') DEFAULT 'nao_concluida',
+    status ENUM('concluida', 'nao_concluida', 'em_progresso') DEFAULT 'nao_concluida',
     taskId INT,
     FOREIGN KEY (taskId) REFERENCES Task(id)
+);
+
+-- Criação da tabela SubSubtask
+CREATE TABLE SubSubtask (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    status ENUM('concluida', 'nao_concluida', 'em_progresso') DEFAULT 'nao_concluida',
+    subtaskId INT,
+    FOREIGN KEY (subtaskId) REFERENCES Subtask(id)
 );
